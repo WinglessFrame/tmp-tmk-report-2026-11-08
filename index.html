@@ -1,0 +1,77 @@
+<!doctype html><meta charset="utf-8"><title>Reelforge Spoof vs MetaGhost — TMK + PDQ</title>
+<style>body{font:15px/1.5 -apple-system,Helvetica,sans-serif;max-width:1300px;margin:24px auto;padding:0 16px;color:#111}
+table{border-collapse:collapse;margin:8px 0 18px}td,th{border:1px solid #ddd;padding:4px 8px;text-align:left;vertical-align:top}th{background:#f4f4f4}
+.w{color:#127a2a;font-weight:600}.t{color:#a66b00;font-weight:600}.grid{display:flex;flex-wrap:wrap;gap:14px}.grid figure{margin:0}figcaption{font-size:13px;color:#555}
+.note{background:#f7f7f2;border-left:4px solid #c9b85a;padding:8px 12px}</style>
+<h1>Reelforge Spoof vs MetaGhost — TMK + PDQ</h1>
+<p>Code: reelforge <code>main</code> at 5d89c50 (PRs #9 and #10). Sources: full-frame 9:16 production clips (no bars top or bottom).
+Each video is <b>Source | MetaGhost | Reelforge</b> with its scores.</p>
+<h2>How to read the scores</h2>
+<ul><li><b>TMK</b> (Meta's video fingerprint) compares the whole clip over time. It gives two numbers from 0 to 1: <b>L1</b> (overall look) and <b>L2</b> (how the look changes over time). 1 means identical. Meta treats two videos as the same when <b>both are 0.7 or higher</b>. <b>Lower is better</b> for us.</li>
+<li><b>PDQ</b> (Meta's image fingerprint) compares single frames, two per second. It counts how many of 256 bits differ. Under 31 a frame counts as the same picture; about 128 is what two unrelated pictures score. We report the median over the clip. <b>Higher is better</b> for us.</li>
+<li>A pair is a <b>win</b> when reelforge is further from the source on all three numbers: lower L1, lower L2 and higher PDQ.</li></ul>
+<h2>1. Same fixed configuration in both tools (5 sources × configs A, B, C)</h2>
+<p><b>Result: reelforge wins 15 of 15 pairs.</b> Medians (L1 / L2 / PDQ):</p><table><tr><th>Config</th><th>MetaGhost Quality</th><th>Reelforge Spoof</th></tr>
+<tr><td>A</td><td>0.851 / 0.872 / 90</td><td><b>0.717 / 0.731 / 108</b></td></tr>
+<tr><td>B</td><td>0.774 / 0.803 / 102</td><td><b>0.504 / 0.594 / 114</b></td></tr>
+<tr><td>C</td><td>0.702 / 0.746 / 114</td><td><b>0.383 / 0.463 / 118</b></td></tr>
+</table><table><tr><th>Control</th><th>A</th><th>B</th><th>C</th></tr>
+<tr><td>zoom <small>×</small></td><td>1.05</td> <td>1.065</td> <td>1.086</td></tr>
+<tr><td>camera_motion <small>% of frame</small></td><td>1.2</td> <td>1.5</td> <td>2</td></tr>
+<tr><td>random_crop <small>% per edge</small></td><td>0.7</td> <td>1.0</td> <td>1.5</td></tr>
+<tr><td>aspect <small></small></td><td>1.012 <small>(MG 1.2)</small></td> <td>1.015 <small>(MG 1.5)</small></td> <td>1.02 <small>(MG 2.0)</small></td></tr>
+<tr><td>speed <small>×</small></td><td>0.99</td> <td>1.007</td> <td>1.015</td></tr>
+<tr><td>pixel_shift <small></small></td><td>1.2</td> <td>1.5</td> <td>2</td></tr>
+<tr><td>film_grain <small></small></td><td>11</td> <td>13</td> <td>16</td></tr>
+<tr><td>noise <small></small></td><td>2.5</td> <td>3</td> <td>4</td></tr>
+<tr><td>hue <small>°</small></td><td>2.5</td> <td>3.5</td> <td>5</td></tr>
+<tr><td>saturation <small></small></td><td>0.98</td> <td>1.02</td> <td>1.03</td></tr>
+<tr><td>contrast <small></small></td><td>0.98</td> <td>1.02</td> <td>1.03</td></tr>
+<tr><td>gamma <small></small></td><td>0.97</td> <td>1.02</td> <td>1.04</td></tr>
+<tr><td>vignette <small></small></td><td>0.05</td> <td>0.07</td> <td>0.1</td></tr>
+<tr><td>color_dna <small></small></td><td>0.6</td> <td>0.75</td> <td>1</td></tr>
+<tr><td>video_bitrate <small>kbps</small></td><td>13000</td> <td>15000</td> <td>18000</td></tr>
+<tr><td>trim_start <small>s</small></td><td>0.04</td> <td>0.06</td> <td>0.1</td></tr>
+<tr><td>trim_end <small>s</small></td><td>0.04</td> <td>0.06</td> <td>0.1</td></tr>
+</table><div class="note"><b>What could not be made identical in MetaGhost</b><ul>
+<li><b>Zoom aim and crop position:</b> MetaGhost draws a random point each render, and there is no option to set it. Reelforge picks it from the clip's content (the framing chooser). The amount of zoom and crop is the same.</li>
+<li><b>Camera-sway path:</b> the amount (% of frame) is the same, but MetaGhost's sway speed and starting phase are internal and random.</li>
+<li><b>Video bitrate:</b> MetaGhost treats it as a cap; its hardware encoder actually wrote about 7.5 Mbps. Reelforge encodes at the set value.</li>
+<li><b>Pitch:</b> reelforge only; MetaGhost has no pitch option (set to 0).</li>
+<li><b>Different units:</b> aspect is a % in MetaGhost and a factor in reelforge (MG 1.2% = 1.012). The numbers in the table are converted to mean the same change.</li>
+<li><b>Rotation, perspective, lens correction and dynamic warp</b> stay on in MetaGhost (at A: rotation −0.15°, perspective 2.5, lens 0.0025, warp 0.6). Reelforge's Spoof no longer applies them because they bent the text. So MetaGhost has four extra distortions here, and reelforge still scores further.</li>
+<li><b>Speed:</b> pinned to MetaGhost's values (0.99, 1.007, 1.015) in both tools. Reelforge's own Spoof range is now 1.02–1.04, so this section does not use that.</li></ul></div>
+<table><tr><th>Source</th><th>Config</th><th>MetaGhost L1 / L2 / PDQ</th><th>Reelforge L1 / L2 / PDQ</th><th>Result</th><th>Video</th></tr>
+<tr><td>1039</td><td>A</td><td>0.910 / 0.898 / 90</td><td>0.740 / 0.744 / 108</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1lcsIqCRPUSDiOtzBIDpfW7WkFZVbLHT_/view" target="_blank">fixed-1039-A.mp4</a></td></tr>
+<tr><td>1039</td><td>B</td><td>0.877 / 0.858 / 102</td><td>0.597 / 0.609 / 114</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1MndK85M3cD1rumAV-9dqbodh1XcSuEhp/view" target="_blank">fixed-1039-B.mp4</a></td></tr>
+<tr><td>1039</td><td>C</td><td>0.770 / 0.746 / 114</td><td>0.440 / 0.463 / 118</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1IHg1Q3ikHLKGQGddcxFRCbcTpJZcsxE7/view" target="_blank">fixed-1039-C.mp4</a></td></tr>
+<tr><td>1148</td><td>A</td><td>0.940 / 0.936 / 90</td><td>0.789 / 0.774 / 122</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1H81r5PCtoIgTuW9wJPdTE4xKTS1N36cD/view" target="_blank">fixed-1148-A.mp4</a></td></tr>
+<tr><td>1148</td><td>B</td><td>0.903 / 0.900 / 106</td><td>0.681 / 0.660 / 124</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1Gi4fY2meWsPc-LK4IWHkBCKt6jqzlKjr/view" target="_blank">fixed-1148-B.mp4</a></td></tr>
+<tr><td>1148</td><td>C</td><td>0.889 / 0.883 / 113</td><td>0.521 / 0.493 / 120</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1dWZ_1glHNd7bhW74cShUGYLmsBxv_f5D/view" target="_blank">fixed-1148-C.mp4</a></td></tr>
+<tr><td>1174</td><td>A</td><td>0.851 / 0.872 / 78</td><td>0.717 / 0.731 / 100</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1f2-TOlTJbatQY79WlU1-OXf9GATnNdpz/view" target="_blank">fixed-1174-A.mp4</a></td></tr>
+<tr><td>1174</td><td>B</td><td>0.774 / 0.803 / 88</td><td>0.504 / 0.594 / 114</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1mlwpl2VNzmKZQd1vuyXp7f5ZQpHcCx9W/view" target="_blank">fixed-1174-B.mp4</a></td></tr>
+<tr><td>1174</td><td>C</td><td>0.702 / 0.759 / 102</td><td>0.383 / 0.474 / 116</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1GmnajF1QXGCtcOw7j-3icuxPtzffdFxv/view" target="_blank">fixed-1174-C.mp4</a></td></tr>
+<tr><td>1027</td><td>A</td><td>0.704 / 0.785 / 93</td><td>0.425 / 0.598 / 106</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1NmLisLZ3H15lEN_gjJ9hhkC8y3vqesSe/view" target="_blank">fixed-1027-A.mp4</a></td></tr>
+<tr><td>1027</td><td>B</td><td>0.623 / 0.733 / 108</td><td>0.249 / 0.464 / 112</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1fLwmtNwZU831LYkw_rpgbjMg_zgoflHV/view" target="_blank">fixed-1027-B.mp4</a></td></tr>
+<tr><td>1027</td><td>C</td><td>0.309 / 0.521 / 114</td><td>0.077 / 0.327 / 116</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1ibBNkysDZaTc9WozQq7xWlih-o-IAbYa/view" target="_blank">fixed-1027-C.mp4</a></td></tr>
+<tr><td>1164</td><td>A</td><td>0.836 / 0.829 / 92</td><td>0.616 / 0.585 / 112</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1kCHO5SZpUs7pPXN9CEIZ2ivM2nhY_7xf/view" target="_blank">fixed-1164-A.mp4</a></td></tr>
+<tr><td>1164</td><td>B</td><td>0.755 / 0.738 / 101</td><td>0.480 / 0.438 / 118</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1yIf8I5elxbr9ws7iOtOUcA15fPTcG_at/view" target="_blank">fixed-1164-B.mp4</a></td></tr>
+<tr><td>1164</td><td>C</td><td>0.607 / 0.575 / 114</td><td>0.350 / 0.303 / 118</td><td class="w">win</td><td><a href="https://drive.google.com/file/d/1B9C902IvOMvyUSHcJTCQnVhUMWdZ9MeG/view" target="_blank">fixed-1164-C.mp4</a></td></tr>
+</table><div class='grid'><figure><iframe src="https://drive.google.com/file/d/1MndK85M3cD1rumAV-9dqbodh1XcSuEhp/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1039 · config B</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1Gi4fY2meWsPc-LK4IWHkBCKt6jqzlKjr/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1148 · config B</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1mlwpl2VNzmKZQd1vuyXp7f5ZQpHcCx9W/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1174 · config B</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1fLwmtNwZU831LYkw_rpgbjMg_zgoflHV/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1027 · config B</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1yIf8I5elxbr9ws7iOtOUcA15fPTcG_at/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1164 · config B</figcaption></figure></div><p><small>Config B shown inline; A and C are linked in the table.</small></p>
+<h2>2. Real use: random values (10 sources)</h2>
+<p>Reelforge: the built-in <b>Spoof (Metaghost)</b> profile drawing its own random values per render, as in production. MetaGhost: <b>simple spoof mode</b> as selected in its UI, random values per render.
+MetaGhost's simple mode applied rotation, perspective, lens correction, per-edge random crop, an aspect crop, pixel-shift ripple, colour and noise tweaks and a speed change; no zoom, camera motion or grain.</p>
+<p><b>Result: reelforge wins 10 of 10.</b> Medians: MetaGhost 0.964 / 0.969 / 68, reelforge <b>0.614 / 0.606 / 114</b>.
+Meta would still match 10 of 10 MetaGhost outputs and 2 of 10 reelforge outputs to their source.</p>
+<table><tr><th>Source</th><th>MetaGhost simple L1 / L2 / PDQ</th><th>Reelforge random L1 / L2 / PDQ</th><th>Reelforge's drawn zoom / sway / crop / speed</th><th>Result</th></tr>
+<tr><td>1012</td><td>0.922 / 0.920 / 74</td><td>0.660 / 0.630 / 110</td><td>1.061 / 1.24% / 0.60% / 1.028</td><td class="w">win</td></tr>
+<tr><td>1015</td><td>0.975 / 0.976 / 42</td><td>0.479 / 0.644 / 108</td><td>1.044 / 1.97% / 1.27% / 1.039</td><td class="w">win</td></tr>
+<tr><td>1027</td><td>0.961 / 0.973 / 75</td><td>0.281 / 0.483 / 114</td><td>1.058 / 1.87% / 1.02% / 1.030</td><td class="w">win</td></tr>
+<tr><td>1031</td><td>0.970 / 0.969 / 108</td><td>0.720 / 0.709 / 114</td><td>1.052 / 1.90% / 1.43% / 1.028</td><td class="w">win</td></tr>
+<tr><td>1049</td><td>0.977 / 0.975 / 62</td><td>0.633 / 0.614 / 110</td><td>1.065 / 1.63% / 0.85% / 1.032</td><td class="w">win</td></tr>
+<tr><td>1141</td><td>0.946 / 0.942 / 104</td><td>0.579 / 0.584 / 116</td><td>1.052 / 1.79% / 1.28% / 1.024</td><td class="w">win</td></tr>
+<tr><td>1164</td><td>0.966 / 0.965 / 59</td><td>0.629 / 0.598 / 110</td><td>1.042 / 1.80% / 0.98% / 1.023</td><td class="w">win</td></tr>
+<tr><td>1165</td><td>0.941 / 0.940 / 54</td><td>0.600 / 0.597 / 114</td><td>1.044 / 1.45% / 0.89% / 1.026</td><td class="w">win</td></tr>
+<tr><td>1174</td><td>0.963 / 0.969 / 51</td><td>0.425 / 0.542 / 114</td><td>1.078 / 1.73% / 1.24% / 1.039</td><td class="w">win</td></tr>
+<tr><td>1238</td><td>0.985 / 0.979 / 106</td><td>0.801 / 0.739 / 116</td><td>1.080 / 1.30% / 0.57% / 1.034</td><td class="w">win</td></tr>
+</table><div class='grid'><figure><iframe src="https://drive.google.com/file/d/1OQCFGjYWVLB2aoFmR2argVNlQHkH1hJn/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1012</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1Q3TEq4DNTE-57Hq7OumLdufd63aD5qbg/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1015</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1chYZ-QyyEazVFlDyra6ndLpMxtRML5Ps/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1027</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1p0IxZwkzfmQwDpO95EBaxKAglyHv4dzp/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1031</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1xVLYOyHPqvunoTp-v5i7gJUOQBo0ZxAD/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1049</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1nXJp3lBxJRqZVyj8eRGWd8eQOONYsuR5/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1141</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1r5o2ZolZcAbWKYHWYqahu49UIxlufBzB/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1164</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1rnQC_0k1GHSEfMlrbAtkHwuG8LG1amgQ/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1165</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1HrFbuaQyxzy9V7YAwHJXgGRFB6OsXuAq/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1174</figcaption></figure><figure><iframe src="https://drive.google.com/file/d/1PGY2lk2J6AbKk_y7rlJsmh02I4nnyd5m/preview" width="405" height="270" allow="autoplay; fullscreen" allowfullscreen style="border:0"></iframe><figcaption>1238</figcaption></figure></div>
